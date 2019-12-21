@@ -4,7 +4,7 @@
 # Smart List for fsq
 # Budd Churchward WB7FHC
 # email: wb7fhc@arrl.net
-V_DATE=09/02/19
+V_DATE="12/21/19"
 #
 # Run this script in a terminal window while Flidigi FSQ is also
 # running. Make sure that you have enabled the Heard Log in FSQ
@@ -13,7 +13,7 @@ V_DATE=09/02/19
 #         Heard log fsq_heard_log.txt [Enable]
 #
 # If you have a copy of fsq_names.csv,
-# put it in /home/pi/.fildigi/temp
+# put it in /home/pi/WB7FHC/
 #
 # Your Smart Heard List is stored as a file so you can shut down
 # your station and bring it up later with the data maintained.
@@ -34,8 +34,8 @@ V_DATE=09/02/19
 #
 # KEYBOARD COMMANDS:
 #   [Escape] ... stop running script
-#   [End]    ... also stops the script
 #   [Insert] ... add new call and name to fsq_names.csv
+#            ... can also be done with [^] if your kbrd has no [Insert]
 #   [Delete] ... remove a call from your heard list
 #   [PgDwn]  ... show more stations heard
 #   [PgUp]   ... show fewer stations heard
@@ -47,7 +47,7 @@ V_DATE=09/02/19
 # SMART LIST FILES:
 #   smart_heard.sh
 #     this file
-#     located @ /home/pi/smart_heard.sh
+#     located @ /home/pi/WB7FHC/smart_heard.sh
 #     use: 'chmod 755 smart_heard.sh' to make executable
 #     use: './smart_heard.sh' to launch in term. window
 #
@@ -60,19 +60,19 @@ V_DATE=09/02/19
 #     working file for this script
 #     contains:
 #         call,epoch time,op name
-#     located @ ~/.flidigi/temp/smart_heard.list
+#     located @ ~/WB7FHC/smart_heard.list
 #
 #   temp.dat
 #     temporary file built from smart_heard.list
 #     will become smart_heard.list
-#     located @ ~/.fildigi/temp/temp.dat
+#     located @ ~/WB7FHC/temp.dat
 #     this file is short lived and is normally
 #     not seen in directory ... script will delete
 #     file if it exists at wrong time
 #
 #   fsq_names.csv
 #     lookup table to match callsign and op's name
-#     located @ ~/.fldigi/temp/fsq_names.csv
+#     located @ ~/WB7FHC/fsq_names.csv
 #
 # TEXT COLORS:
 #    YELLOW ... station heard less than 10 minutes ago
@@ -81,7 +81,7 @@ V_DATE=09/02/19
 #    BLUE   ... station not heard in last 24 hours
 #
 ####################################################
-#SHOW_RADIO=false   # if true heard list will show L and R s
+SHOW_RADIO=false   # if true heard list will show L and R s
 SHOW_RADIO=$2   # if true heard list will show L and R s
 LR_CHANNEL=$1
 
@@ -95,7 +95,7 @@ if [[ $LR_CHANNEL == "right" ]]; then
 else
   PTTpin=26
   RADIO=L
-  LR_CHANNEL='left'
+  LR_CHANNEL='left' # will always default to left if not specified
 fi
 
 
@@ -114,9 +114,10 @@ fullList=1         # to switch between short, medium & long lists
                    # 2 = full list is all stations up to 99
 max=21             # default show only last 20
 
-refreshInterval=60 # default is 10 seconds can be increased
+refreshInterval=60 # default was 10 seconds can be increased
                    # or decreased in steps of 5 with the
                    # Up and Down Arrows ... minimum of 5 sec.
+		   # when list gets longer refresh becomes distracting
 
 
 
