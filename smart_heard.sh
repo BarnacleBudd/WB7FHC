@@ -81,9 +81,10 @@ V_DATE="12/21/19"
 #    BLUE   ... station not heard in last 24 hours
 #
 ####################################################
-SHOW_RADIO=false   # if true heard list will show L and R s
-SHOW_RADIO=$2   # if true heard list will show L and R s
-LR_CHANNEL=$1
+SHOW_RADIO=false    # if true heard list will show L and R s
+SHOW_RADIO=$2       # if true heard list will show L and R s
+LR_CHANNEL=$1       # left or right from argument
+SHOW_HOW_HOT=false  # if true CPU temp will show in title bar
 
 # GPIO pin on Rpi for UDRC-II used to
 # tell that this station has transmitted
@@ -162,11 +163,11 @@ while read line; do
     myCall=${myCall#*>} # everything after the first >
     myCall=${myCall%<*} # everything before the first <
   fi
-
 done <$CONFIG_FILE
-echo -ne '\033]0;'Smart List 'for' fsq_$myCall' ['$LR_CHANNEL' radio]\007'
 
 # RENAME THE TERMINAL WINDOW
+echo -ne '\033]0;'Smart List 'for' fsq_$myCall' ['$LR_CHANNEL' radio]\007'
+
 function showTemp {
 cpu=$(cat /sys/class/thermal/thermal_zone0/temp)
 echo -ne '\033]0;CP: '$((cpu/1000)) 'c ['$LR_CHANNEL' radio]\007'
@@ -488,11 +489,13 @@ function waitForOne {
         fi
         refreshList
       fi
-      tempCount=$((tempCount+1))
-      if ((tempCount==60)); then
-	showTemp
-	tempCount=0
-      fi
+      if [[ $SHOW_HOW_HOT ]]; then
+        tempCount=$((tempCount+1))
+        if ((tempCount==60)); then
+	  showTemp
+	  tempCount=0
+        fi
+      fi	
     done
     lastStamp=$thisStamp
 
