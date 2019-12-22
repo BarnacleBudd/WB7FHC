@@ -99,10 +99,42 @@ else
   LR_CHANNEL='left' # will always default to left if not specified
 fi
 
+COMMON_DIR=~/WB7FHC
+ourFile=$COMMON_DIR/smart_heard.list
+  if [[ ! -f $ourFile ]]; then
+    touch $ourFile    # create the file if it doesn't exist
+  fi
 
+
+#Let's back up the current smart_heard.list
+if [ ! -d $COMMON_DIR/bkp ]; then
+  mkdir $COMMON_DIR/bkp
+fi
+TIMESTAMP=`date +%Y%m%d.%H%M%S`
+cp "smart_heard.list" "bkp/smart_heard."$TIMESTAMP".list"
+
+#Now let's delete the oldest backup
+age_check=`date +" %s"` #current epoch time
+file_counter=0
+for file_name in $COMMON_DIR/bkp/*; do
+  time_stamp=$(stat $file_name -c %Y)
+  if (( time_stamp < age_check )); then
+    age_check=$time_stamp
+    oldest_file=$file_name
+ fi
+    file_counter=$((file_counter+1))
+
+done
+  if (( file_counter > 5 )); then
+    rm $oldest_file
+  fi
 
 FSQ_PATH=~/.fldigi-$LR_CHANNEL/temp
 cd $FSQ_PATH
+
+
+
+
 lastGuy='nobody'
 includeDT=0        # to toggle between showing dates
                    # and times on the display use RT Arrow
@@ -124,7 +156,8 @@ refreshInterval=60 # default was 10 seconds can be increased
 
 
 
-OPS_NAMES=~/WB7FHC/fsq_names.csv   # look up table
+#OPS_NAMES=~/WB7FHC/fsq_names.csv   # look up table
+OPS_NAMES=$COMMON_DIR/fsq_names.csv   # look up table
 
 if [[ ! -f $OPS_NAMES ]]; then
   # init the table
@@ -219,10 +252,6 @@ function setScreen {
   lastStamp=$thisStamp # when these two don't match
                        # we know something has happened
 
-  ourFile=~/WB7FHC/smart_heard.list
-  if [[ ! -f $ourFile ]]; then
-    touch $ourFile    # create the file if it doesn't exist
-  fi
 
   # DOES OUR OLD HEARD LIST EXIST? IF SO CONVERT IT.
   # EARLIER VERSIONS DID NOT INCLUDE DATE OR TIME IN LIST
@@ -489,7 +518,7 @@ function waitForOne {
         fi
         refreshList
       fi
-      if [[ $SHOW_HOW_HOT ]]; then
+      if [[ $SHOW_HOW_HOT == "true" ]]; then
         tempCount=$((tempCount+1))
         if ((tempCount==60)); then
 	  showTemp
